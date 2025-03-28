@@ -38,6 +38,7 @@ defmodule CustomEnum do
   defp reverse(list), do: reverse(list, [])
 
   defp reverse([], accumulator) do
+
     accumulator
   end
 
@@ -90,9 +91,34 @@ defmodule CustomEnum do
 
   def take(list, count) when count < 0,
     do: list |> reverse() |> do_take(abs(count), []) |> reverse()
+
+  defp do_split([], _count, acc) do
+    {reverse(acc), []}
+  end
+
+  defp do_split(list, 0, acc) do
+    {reverse(acc), list}
+  end
+
+  defp do_split([head | tail], count, acc) do
+    do_split(tail, count - 1, [head | acc])
+  end
+
+  def split(list, count) when count > 0 do
+    do_split(list, count, [])
+  end
+
+  def split(list, count) when count < 0 do
+    {left, right} = do_split(reverse(list), abs(count), [])
+    {reverse(right), reverse(left)}
+  end
+
+  def split(list, count) when count == 0 do
+    {[], list}
+  end
 end
 
-custom_list = Enum.to_list(1..100)
+custom_list = Enum.to_list(1..20)
 
 IO.inspect(CustomEnum.all?([1, 2, 3, 4], &(&1 < 10)))
 
@@ -103,3 +129,11 @@ IO.inspect(CustomEnum.filter(custom_list, &(rem(&1, 7) == 3)))
 CustomEnum.take(custom_list, 20) |> inspect() |> IO.puts()
 
 CustomEnum.take(custom_list, -13) |> inspect(charlists: :as_lists) |> IO.puts()
+
+CustomEnum.split(custom_list, 0) |> IO.inspect()
+
+CustomEnum.split(custom_list, -3) |> IO.inspect()
+
+CustomEnum.split(custom_list, 10) |> IO.inspect()
+
+CustomEnum.split(custom_list, 25) |> IO.inspect()
